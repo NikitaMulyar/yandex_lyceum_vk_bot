@@ -1,2 +1,0 @@
-LOGIN = '79775446373'
-PASSWORD = 'antirockwho'

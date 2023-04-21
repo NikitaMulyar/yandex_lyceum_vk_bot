@@ -1,8 +1,11 @@
 import pprint
 import vk_api
-from config import *
 import json
 from datetime import datetime
+
+
+LOGIN = '79775446373'
+PASSWORD = 'antirockwho'
 
 
 def auth_handler():
