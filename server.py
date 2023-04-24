@@ -1,7 +1,9 @@
 import pprint
 import vk_api
+from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 import json
 from datetime import datetime
+import random
 import requests
 
 LOGIN = '79775446373'
@@ -58,18 +60,28 @@ def upload_photo(vk: vk_api.vk_api.VkApiMethod):
 def main():
     login, password = LOGIN, PASSWORD
     vk_session = vk_api.VkApi(
-        login, password,
-        # функция для обработки двухфакторной аутентификации
-        auth_handler=auth_handler
+        token='vk1.a.qFQUTPgIWJRg2W0jbLzqG5V1fgX8XFijNr9e50mvsds1CGgkRjlWUY7tNtvfAFrDgcn29_BBeYsM5Jd3SdjiB9tZ1Beo3LpDfoDdrRMqUmFlqjWJl_VKJmWI19HCfumO_m-jofnyIfpzKngJ8tQysVPbgNIOxd2cOZ2RHMmMyN2ujK3N4U6wkmjb4IH-JGFTFlBKahSRBOiz7oIXnHbxhg'
     )
 
-    try:
+    """try:
         vk_session.auth(token_only=True)
     except vk_api.AuthError as error_msg:
         print(error_msg)
-        return
+        return"""
+
+    longpoll = VkBotLongPoll(vk_session, group_id='220062557')
+
     vk = vk_session.get_api()
-    upload_photo(vk)
+    for event in longpoll.listen():
+        if event.type == VkBotEventType.MESSAGE_NEW:
+            id = event.obj.message['from_id']
+            user_get = vk.users.get(user_ids=id, fields='city')[0]
+            print(user_get)
+            vk.messages.send(user_id=event.obj.message['from_id'],
+                             message=f"Привет, {user_get['first_name']}! " +
+                                     f"Как поживает {user_get['city']['title']}?" if
+                             user_get.get('city') is not None else "",
+                             random_id=random.randint(0, 2 ** 64))
 
 
 if __name__ == '__main__':
