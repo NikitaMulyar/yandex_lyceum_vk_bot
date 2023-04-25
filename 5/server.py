@@ -1,7 +1,7 @@
 import datetime
 import json
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import vk_api
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
@@ -80,9 +80,9 @@ def main():
                                  message=einlad,
                                  random_id=random.randint(0, 2 ** 64))
             else:
-                tm = datetime.now()
+                tm = datetime.now() + timedelta(hours=3)
                 DAYS = {0: 'понедельник', 1: 'вторник', 2: 'среда', 3: 'четверг', 4: 'пятница', 5: 'суббота', 6: 'воскресенье'}
-                s = f"Дата: {tm.day}.{tm.month}.{tm.year}, время (МСК): {tm.hour}:{tm.minute}\nДень недели: {DAYS[tm.weekday()]}"
+                s = f"Дата: {str(tm.day).rjust(2, '0')}.{str(tm.month).rjust(2, '0')}.{tm.year}, время (МСК): {str(tm.hour).rjust(2, '0')}:{str(tm.minute).rjust(2, '0')}\nДень недели: {DAYS[tm.weekday()]}"
                 vk.messages.send(user_id=event.obj.message['from_id'],
                                  message=s,
                                  random_id=random.randint(0, 2 ** 64))
