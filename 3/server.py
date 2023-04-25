@@ -49,12 +49,20 @@ def upload_photo(vk: vk_api.vk_api.VkApiMethod):
              group_id=220062557)
 
 
+def captcha_handler(captcha):
+    key = input("Enter captcha code {0}: ".format(captcha.get_url())).strip()
+    return captcha.try_again(key)
+
+
+
 def main():
     login, password = LOGIN, PASSWORD
-    vk_session = vk_api.VkApi(login, password, auth_handler=auth_handler)
+    vk_session = vk_api.VkApi(login, password)
 
     try:
         vk_session.auth(token_only=True)
+    except vk_api.exceptions.Captcha as captcha:
+        captcha_handler(captcha)
     except vk_api.AuthError as error_msg:
         print(error_msg)
         return
