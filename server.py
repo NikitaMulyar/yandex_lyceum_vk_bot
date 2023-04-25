@@ -1,10 +1,10 @@
-import pprint
+import datetime
+import json
+import random
+from datetime import datetime
+
 import vk_api
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
-import json
-from datetime import datetime
-import random
-import requests
 
 LOGIN = '79775446373'
 PASSWORD = 'antirockwho'
@@ -58,30 +58,39 @@ def upload_photo(vk: vk_api.vk_api.VkApiMethod):
 
 
 def main():
-    login, password = LOGIN, PASSWORD
     vk_session = vk_api.VkApi(
         token='vk1.a.qFQUTPgIWJRg2W0jbLzqG5V1fgX8XFijNr9e50mvsds1CGgkRjlWUY7tNtvfAFrDgcn29_BBeYsM5Jd3SdjiB9tZ1Beo3LpDfoDdrRMqUmFlqjWJl_VKJmWI19HCfumO_m-jofnyIfpzKngJ8tQysVPbgNIOxd2cOZ2RHMmMyN2ujK3N4U6wkmjb4IH-JGFTFlBKahSRBOiz7oIXnHbxhg'
     )
-
-    """try:
-        vk_session.auth(token_only=True)
-    except vk_api.AuthError as error_msg:
-        print(error_msg)
-        return"""
 
     longpoll = VkBotLongPoll(vk_session, group_id='220062557')
 
     vk = vk_session.get_api()
     for event in longpoll.listen():
         if event.type == VkBotEventType.MESSAGE_NEW:
+            txt = event.obj.message['text'].lower()
             id = event.obj.message['from_id']
             user_get = vk.users.get(user_ids=id, fields='city')[0]
-            print(user_get)
+            einlad = "А ты знал, что можно узнать " \
+                     "информацию а сегодняшнем дне? " \
+                     "Используй слова 'время', 'число', " \
+                     "'дата', 'день' в своем сообщении!"
             vk.messages.send(user_id=event.obj.message['from_id'],
                              message=f"Привет, {user_get['first_name']}! " +
                                      f"Как поживает {user_get['city']['title']}?" if
-                             user_get.get('city') is not None else "",
+                             user_get.get(
+                                 'city') is not None else "",
                              random_id=random.randint(0, 2 ** 64))
+            if 'день' not in txt and 'время' not in txt and 'число' not in txt and 'дата' not in txt:
+                vk.messages.send(user_id=event.obj.message['from_id'],
+                                 message=einlad,
+                                 random_id=random.randint(0, 2 ** 64))
+            else:
+                tm = datetime.now()
+                DAYS = {0: 'понедельник', 1: 'вторник', 2: 'среда', 3: 'четверг', 4: 'пятница', 5: 'суббота', 6: 'воскресенье'}
+                s = f"Дата: {tm.day}.{tm.month}.{tm.year}, время (МСК): {tm.hour}:{tm.minute}\nДень недели: {DAYS[tm.weekday()]}"
+                vk.messages.send(user_id=event.obj.message['from_id'],
+                                 message=s,
+                                 random_id=random.randint(0, 2 ** 64))
 
 
 if __name__ == '__main__':
