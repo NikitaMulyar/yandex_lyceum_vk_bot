@@ -11,17 +11,12 @@ PASSWORD = 'antirockwho'
 
 
 def auth_handler():
-    """ При двухфакторной аутентификации вызывается эта функция. """
-
-    # Код двухфакторной аутентификации,
-    # который присылается по смс или уведомлением в мобильное приложение
     with open('codes.json', mode='r') as file:
         res = json.loads(file.read())
     key = res[0]
     res.pop(0)
     with open('codes.json', mode='w') as file:
         json.dump(res, file)
-    # Если: True - сохранить, False - не сохранять.
     remember_device = True
 
     return key, remember_device
@@ -51,11 +46,7 @@ def main():
                                  'city') is not None else "",
                              random_id=random.randint(0, 2 ** 64))
             login, password = LOGIN, PASSWORD
-            vk_session2 = vk_api.VkApi(
-                login, password,
-                # функция для обработки двухфакторной аутентификации
-                auth_handler=auth_handler
-            )
+            vk_session2 = vk_api.VkApi(login, password, auth_handler=auth_handler)
 
             try:
                 vk_session2.auth(token_only=True)
