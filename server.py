@@ -27,42 +27,12 @@ def auth_handler():
     return key, remember_device
 
 
-def get_wall(vk: vk_api.vk_api.VkApiMethod):
-    response = vk.wall.get(count=5, offset=1)
-    if response['items']:
-        cnt = 1
-        for i in response['items']:
-            print(f'===================== {cnt} =====================')
-            cnt += 1
-            print(i['text'] + ';')
-            d = datetime.fromtimestamp(i["date"]).isoformat().split('T')
-            print(f'date: {d[0]}, time: {d[1].split("Z")[0]}')
-
-
-def get_friends(vk: vk_api.vk_api.VkApiMethod):
-    response = vk.friends.get(fields="bdate, city")
-    res = []
-    if response['items']:
-        for i in response['items']:
-            res.append((i['last_name'], i['first_name'], i.get('bdate', 'None')))
-    cnt = 1
-    for i in sorted(res, key=lambda a: a[0]):
-        print(f'{cnt}. {i[0]} {i[1]}. День рождения: {i[2]}')
-        cnt += 1
-
-
-def upload_photo(vk: vk_api.vk_api.VkApiMethod):
-    up = vk_api.VkUpload(vk)
-    up.photo(photos=[f'static/img/{i}.jpeg' for i in range(1, 4)], album_id=291455597,
-             group_id=220062557)
-
-
 def main():
     vk_session = vk_api.VkApi(
-        token='vk1.a.qFQUTPgIWJRg2W0jbLzqG5V1fgX8XFijNr9e50mvsds1CGgkRjlWUY7tNtvfAFrDgcn29_BBeYsM5Jd3SdjiB9tZ1Beo3LpDfoDdrRMqUmFlqjWJl_VKJmWI19HCfumO_m-jofnyIfpzKngJ8tQysVPbgNIOxd2cOZ2RHMmMyN2ujK3N4U6wkmjb4IH-JGFTFlBKahSRBOiz7oIXnHbxhg'
+        token='vk1.a.SB6IBIttAopz-GizAevbns_Zwo4mFtiVdBtjCwhTHaPJpZdwRI9X35uFpp6Dz7pB8LmywuMCDeUmulKYw9V-oFsPLNBXliCDW1uNHDGMuOokWXA1Aw7BEVxhM6EY1I_c9nU9G-7LdmB8_RpmEAIj2UzxuDNt3HWlcjyKI8dbxaVVVywZKq8JWKPxgrTko6FJ64sJ4I9XOsopjEabkoWk_Q'
     )
 
-    longpoll = VkBotLongPoll(vk_session, group_id='220062557')
+    longpoll = VkBotLongPoll(vk_session, group_id='220125061')
 
     vk = vk_session.get_api()
     for event in longpoll.listen():
@@ -80,6 +50,26 @@ def main():
                              user_get.get(
                                  'city') is not None else "",
                              random_id=random.randint(0, 2 ** 64))
+            login, password = LOGIN, PASSWORD
+            vk_session2 = vk_api.VkApi(
+                login, password,
+                # функция для обработки двухфакторной аутентификации
+                auth_handler=auth_handler
+            )
+
+            try:
+                vk_session2.auth(token_only=True)
+            except vk_api.AuthError as error_msg:
+                print(error_msg)
+                return
+            vk2 = vk_session2.get_api()
+            response = vk2.photos.get(album_id=292939865, group_id=220125061)
+            if response['items']:
+                img = random.choice(response['items'])
+                vk.messages.send(user_id=event.obj.message['from_id'],
+                                 attachment=f'photo{img["owner_id"]}_{img["id"]}',
+                                 random_id=random.randint(0, 2 ** 64),
+                                 message="Куку!")
             if 'день' not in txt and 'время' not in txt and 'число' not in txt and 'дата' not in txt:
                 vk.messages.send(user_id=event.obj.message['from_id'],
                                  message=einlad,
