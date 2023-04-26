@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main1">
+<h1 class="header">Vk.com Statistics</h1>
+
+<div class="categ">
+    <h3 id="act">Activities</h3>
+    <table class="table">
+    <thead>
+        <tr class="table-info">
+            <th scope="col" class="col-2">Активность</th>
+            <th scope="col" class="col-2">Количество</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for i in data["activity"] %}
+            <tr class="table-info">
+              <td class="col-2">{{ i }}</td>
+              <td class="col-2">{{ data["activity"][i] }}</td>
+            </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+</div><br>
+
+<div class="categ">
+    <h3 id="age">Ages</h3>
+    <table class="table">
+    <thead>
+        <tr class="table-success">
+            <th scope="col" class="col-2">Возраст</th>
+            <th scope="col" class="col-2">Количество</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for i in data["ages"] %}
+            <tr class="table-success">
+              <td class="col-2">{{ i }}</td>
+              <td class="col-2">{{ data["ages"][i] }}</td>
+            </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+</div><br>
+
+<div class="categ">
+    <h3 id="city">Cities</h3>
+    <table class="table">
+    <thead>
+        <tr class="table-warning">
+            <th scope="col" class="col-2">Город</th>
+            <th scope="col" class="col-2">Количество</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for i in data["cities"] %}
+            <tr class="table-warning">
+              <td class="col-2">{{ i }}</td>
+              <td class="col-2">{{ data["cities"][i] }}</td>
+            </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+</div><br>
+
+<div class="categ">
+    <h3 id="country">Countries</h3>
+    <table class="table">
+    <thead>
+        <tr class="table-primary">
+            <th scope="col" class="col-2">Страна</th>
+            <th scope="col" class="col-2">Количество</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for i in data["countries"] %}
+            <tr class="table-primary">
+              <td class="col-2">{{ i }}</td>
+              <td class="col-2">{{ data["countries"][i] }}</td>
+            </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+</div><br>
+</div>
+{% endblock %}
